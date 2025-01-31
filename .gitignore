@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+##Ignore build specific folders
+bin/
+obj/
+
+## Ignore build specific files
+*.dSYM
+.DS_Store
