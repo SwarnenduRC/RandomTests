@@ -17,13 +17,13 @@ int main()
     std::vector<std::thread> producers;
     std::vector<std::thread> consumers;
 
-    for (size_t id = 1; id < 5; ++id)
+    for (size_t id = 1; id < 15; ++id)
     {
         std::unique_ptr<Producer> producer(new Producer());
         producer->setID(id);
         producers.emplace_back(std::thread(&Producer::produce, std::move(producer), Data::getRandomNumber()));
     }
-    for (size_t id = 1; id < 5; ++id)
+    for (size_t id = 1; id < 15; ++id)
     {
         std::unique_ptr<Consumer> consumer(new Consumer());
         consumer->setID(id);

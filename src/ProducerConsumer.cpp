@@ -31,6 +31,7 @@ void Producer::produce(const int val)
     std::cout << "produces data[" << val << "] ";
     std::cout << "while running in thread " << std::this_thread::get_id() << "\n" << std::endl;
     m_cv.notify_one();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void Producer::consume()
@@ -44,12 +45,13 @@ void Consumer::consume()
     m_cv.wait(lock, []{ return !m_dataQueue.empty() || m_isDataReady; });
     m_consumedDataQ.emplace(m_dataQueue.front());
     m_dataQueue.pop();
-    std::cout << std::endl << "Consumer[" << getID() << "]";
+    std::cout << std::endl << "Consumer[" << getID() << "] ";
     std::cout << "consumes data[" << m_consumedDataQ.front() << "] ";
     std::cout << "while running in thread " << std::this_thread::get_id() << "\n" << std::endl;
     m_consumedDataQ.pop();
     lock.unlock();
     m_cv.notify_all();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void Consumer::produce(const int)

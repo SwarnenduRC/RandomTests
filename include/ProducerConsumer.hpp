@@ -18,7 +18,10 @@ class Data
         Data(const Data&) = delete;
         Data& operator=(const Data&) = delete;
         virtual ~Data() = default;
-    
+        /**
+         * @brief Static members to be shared among all instances of Data
+         * and its derived classes
+         */
         static std::mutex m_mtx;
         static std::atomic_bool m_isDataReady;
         static std::condition_variable m_cv;
@@ -39,7 +42,6 @@ class Producer : public Data
 class Consumer : public Data
 {
     public:
-        int getData() noexcept;
         void consume() override;
     private:
         void produce(const int) override;
