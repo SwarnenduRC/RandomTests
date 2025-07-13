@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+#include <logger/LOGGER_MACROS.hpp>
+
 //int main(int argc, char **argv)
 int main()
 {
@@ -14,6 +16,7 @@ int main()
     std::cout << std::endl << std::endl;
     return retVal; */
 
+    logger::LOG_ENTRY();
     std::vector<std::thread> producers;
     std::vector<std::thread> consumers;
 

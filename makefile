@@ -5,6 +5,8 @@ INC_DIR := include
 OBJ_DIR := obj
 TEST_OBJ_DIR := obj/test
 BIN_DIR := bin
+USR_LIB_DIR := /usr/local/lib/
+LOGGER_LIB_NAME := logger
 
 ##Compiler flags
 CXX := clang++
@@ -12,6 +14,8 @@ CXX := clang++
 CXXFLAGS := -std=c++20 -g -Wall -Wextra -Werror -Wno-unused-function \
 			-I$(INC_DIR) -I$(TEST_DIR) \
 			$(addprefix -I, $(wildcard $(INC_DIR)/*), $(wildcard $(TEST_DIR)/*))
+
+LDD_FLAGS := -L$(USR_LIB_DIR) -l$(LOGGER_LIB_NAME) -Wl,-rpath,$(USR_LIB_DIR)
 
 ##Files
 SRCS := $(shell find $(SRC_DIR) -name "*.cpp")
@@ -35,12 +39,12 @@ debug : $(DBG_TARGET)
 
 $(TARGET) : $(OBJS) $(TEST_OBJS) | $(BIN_DIR)
 	@echo "Linking release build...."
-	$(CXX) $(CXXFLAGS) -lgtest -lgmock -lpthread -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgmock -lpthread -llogger $(LDD_FLAGS)
 	@echo "Linking release build completed"
 
 $(DBG_TARGET) : $(DBG_OBJS) $(DBG_TEST_OBJS) | $(BIN_DIR)
 	@echo "Linking debug build...."
-	$(CXX) $(CXXFLAGS) -lgtest -lgmock -lpthread -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgmock -lpthread -llogger $(LDD_FLAGS)
 	@echo "Linking debug build completed"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
@@ -60,7 +64,7 @@ $(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp | $(TEST_OBJ_DIR)
 
 $(TEST_OBJ_DIR)/%_d.o: $(TEST_DIR)/%.cpp | $(TEST_OBJ_DIR)
 	@echo "Compiling debug test build...."
-	$(CXX) $(CXXFLAGS) -c $< -o $@ -DDEBUG
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LDD_FLAGS) -DDEBUG
 	@echo "Compiling debug build completed"
 
 $(OBJ_DIR):

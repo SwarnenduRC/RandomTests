@@ -1,14 +1,7 @@
 #include "ProducerConsumer.hpp"
-
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include <queue>
 #include <random>
-#include <exception>
-#include <thread>
-#include <chrono>
-#include <iostream>
+
+#include <logger/LOGGER_MACROS.hpp>
 
 std::queue<int> Data::m_dataQueue;
 std::mutex Data::m_mtx;
@@ -25,13 +18,17 @@ std::atomic_bool Data::m_isDataReady(false);
 
 void Producer::produce(const int val)
 {
+    logger::LOG_ENTRY();
     std::lock_guard<std::mutex> lock(m_mtx);
     m_dataQueue.emplace(val);
-    std::cout << std::endl << "Producer[" << getID() << "] ";
-    std::cout << "produces data[" << val << "] ";
-    std::cout << "while running in thread " << std::this_thread::get_id() << "\n" << std::endl;
+    std::ostringstream oss;
+    oss << std::endl << "Producer[" << getID() << "] ";
+    oss << "produces data[" << val << "] ";
+    oss << "while running in thread " << std::this_thread::get_id() << "\n" << std::endl;
+    logger::LOG_INFO(oss.str());
     m_cv.notify_one();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    logger::LOG_EXIT();
 }
 
 void Producer::consume()
@@ -41,17 +38,21 @@ void Producer::consume()
 
 void Consumer::consume()
 {
+    logger::LOG_ENTRY();
     std::unique_lock<std::mutex> lock(m_mtx);
     m_cv.wait(lock, []{ return !m_dataQueue.empty() || m_isDataReady; });
     m_consumedDataQ.emplace(m_dataQueue.front());
     m_dataQueue.pop();
-    std::cout << std::endl << "Consumer[" << getID() << "] ";
-    std::cout << "consumes data[" << m_consumedDataQ.front() << "] ";
-    std::cout << "while running in thread " << std::this_thread::get_id() << "\n" << std::endl;
+    std::ostringstream oss;
+    oss << std::endl << "Consumer[" << getID() << "] ";
+    oss << "consumes data[" << m_consumedDataQ.front() << "] ";
+    oss << "while running in thread " << std::this_thread::get_id() << "\n" << std::endl;
+    logger::LOG_INFO(oss.str());
     m_consumedDataQ.pop();
     lock.unlock();
     m_cv.notify_all();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    logger::LOG_EXIT();
 }
 
 void Consumer::produce(const int)
