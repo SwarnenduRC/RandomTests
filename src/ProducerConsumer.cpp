@@ -22,9 +22,9 @@ void Producer::produce(const int val)
     std::lock_guard<std::mutex> lock(m_mtx);
     m_dataQueue.emplace(val);
     std::ostringstream oss;
-    oss << std::endl << "Producer[" << getID() << "] ";
+    oss << "Producer[" << getID() << "] ";
     oss << "produces data[" << val << "] ";
-    oss << "while running in thread " << std::this_thread::get_id() << "\n" << std::endl;
+    oss << "while running in thread " << std::this_thread::get_id();
     logger::LOG_INFO(oss.str());
     m_cv.notify_one();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -44,9 +44,9 @@ void Consumer::consume()
     m_consumedDataQ.emplace(m_dataQueue.front());
     m_dataQueue.pop();
     std::ostringstream oss;
-    oss << std::endl << "Consumer[" << getID() << "] ";
+    oss << "Consumer[" << getID() << "] ";
     oss << "consumes data[" << m_consumedDataQ.front() << "] ";
-    oss << "while running in thread " << std::this_thread::get_id() << "\n" << std::endl;
+    oss << "while running in thread " << std::this_thread::get_id();
     logger::LOG_INFO(oss.str());
     m_consumedDataQ.pop();
     lock.unlock();
